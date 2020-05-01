@@ -1,0 +1,48 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "sidebar editor";
+  width: 100vw;
+  height: 100vh;
+}
+
+.sidebar { 
+  grid-area: sidebar; 
+  padding: 8px;
+  background-color: rgb(247, 249, 249);
+  text-align: center;
+}
+
+.editor { 
+  grid-area: editor; 
+  overflow: auto;
+  position: relative;
+}
+
+.dropzone {
+  height: 100%;
+  min-height: min-content;
+  min-width: min-content;
+}
+
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.centered {
+  text-align: center;
+  line-height: 90px;
+  height: 100%;
+}
+
+.box {
+  position: absolute;
+  display: block;
+  background-color: rgba(200, 100, 100, 0.2);
+  border-color: rgba(255, 0, 0, 0.8);
+  border-style: solid;
+}

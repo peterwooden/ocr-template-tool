@@ -1,0 +1,1 @@
+Useful for identifying bounding box coordinates in forms for OCR templates.
