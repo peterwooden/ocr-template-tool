@@ -62,7 +62,10 @@ function App() {
           <h4>Coordinates</h4>
           <small>(x1, y1, x2, y2)</small>
           {list.map((coord, i) => <Alert key={i} variant="info">
-            {coord.join(', ')}
+            {coord.join(', ')} 
+            <button type="button" className="close" aria-label="Close" onClick={() => setList(list => list.filter((v, idx) => i !== idx))}>
+              <span aria-hidden="true">&times;</span>
+            </button>
           </Alert>)}
           {mouseDown && <Alert variant="light">{boxCoords.left}, {boxCoords.top}, {boxCoords.left + boxCoords.width}, {boxCoords.top + boxCoords.height}</Alert>}
         </div>

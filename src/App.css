@@ -12,6 +12,7 @@
   padding: 8px;
   background-color: rgb(247, 249, 249);
   text-align: center;
+  overflow-y: auto;
 }
 
 .editor { 
