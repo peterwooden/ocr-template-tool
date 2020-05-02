@@ -29,7 +29,7 @@ function eventToPointerCoordinates(e) {
 }
 
 
-function SelectionBox({visible, coords}){
+function SelectionBox({ visible, coords }) {
   return visible && <div className="box" style={coords} />
 }
 
@@ -64,12 +64,13 @@ function App() {
           {list.map((coord, i) => <Alert key={i} variant="info">
             {coord.join(', ')}
           </Alert>)}
+          {mouseDown && <Alert variant="light">{boxCoords.left}, {boxCoords.top}, {boxCoords.left + boxCoords.width}, {boxCoords.top + boxCoords.height}</Alert>}
         </div>
         <div className="editor">
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
-            {imgSrc ? <img src={imgSrc} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} draggable="false" alt="template"/> : <div className="centered">Drop an image here</div>}
-            <SelectionBox visible={mouseDown} coords={boxCoords}/>
+            {imgSrc ? <img src={imgSrc} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} draggable="false" alt="template" /> : <div className="centered">Drop an image here</div>}
+            <SelectionBox visible={mouseDown} coords={boxCoords} />
           </div>
         </div>
       </div>
