@@ -45,4 +45,5 @@ img {
   background-color: rgba(200, 100, 100, 0.2);
   border-color: rgba(255, 0, 0, 0.8);
   border-style: solid;
+  pointer-events: none;
 }
