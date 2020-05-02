@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { Container, Row, Col, Alert } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -68,7 +68,7 @@ function App() {
         <div className="editor">
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
-            {imgSrc ? <img src={imgSrc} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} draggable="false" /> : <div className="centered">Drop an image here</div>}
+            {imgSrc ? <img src={imgSrc} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} draggable="false" alt="template"/> : <div className="centered">Drop an image here</div>}
             <SelectionBox visible={mouseDown} coords={boxCoords}/>
           </div>
         </div>
