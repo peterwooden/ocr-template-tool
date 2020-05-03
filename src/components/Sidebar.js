@@ -8,7 +8,7 @@ export default function Sidebar({ currentBox, list, removeCoords }) {
             <small>(x1, y1, x2, y2)</small>
             {list.map((coord, i) => (
                 <Alert key={i} variant="info">
-                    {coord.join(', ')}
+                    {coord.map(Math.round).join(', ')}
                     <button
                         type="button"
                         className="close"
@@ -21,9 +21,12 @@ export default function Sidebar({ currentBox, list, removeCoords }) {
             ))}
             {currentBox && (
                 <Alert variant="light">
-                    {currentBox.left}, {currentBox.top},{' '}
-                    {currentBox.left + currentBox.width},{' '}
-                    {currentBox.top + currentBox.height}
+                    {[
+                        currentBox.left,
+                        currentBox.top,
+                        currentBox.left + currentBox.width,
+                        currentBox.top + currentBox.height,
+                    ].join(', ')}
                 </Alert>
             )}
         </div>
