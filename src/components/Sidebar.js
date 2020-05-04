@@ -26,7 +26,7 @@ export default function Sidebar({ currentBox, list, removeCoords }) {
                         currentBox.top,
                         currentBox.left + currentBox.width,
                         currentBox.top + currentBox.height,
-                    ].join(', ')}
+                    ].map(Math.round).join(', ')}
                 </Alert>
             )}
         </div>
