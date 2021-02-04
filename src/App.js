@@ -26,6 +26,7 @@ function App() {
                 <Sidebar {...{ list, currentBox, removeCoords }} />
                 <Editor
                     {...{
+                        list,
                         currentBox,
                         selectDragMouseHandlers,
                     }}

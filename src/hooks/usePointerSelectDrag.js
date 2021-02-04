@@ -32,16 +32,7 @@ export default function usePointerSelectDrag(onComplete) {
         [mouseDown]
     );
 
-    const currentBox = mouseDown && {
-        x1,
-        y1,
-        x2,
-        y2,
-        left: Math.min(x1, x2),
-        top: Math.min(y1, y2),
-        width: Math.abs(x1 - x2),
-        height: Math.abs(y1 - y2),
-    };
+    const currentBox = mouseDown && [x1, y1, x2, y2];
 
     return {
         selectDragMouseHandlers: { onMouseDown, onMouseMove, onMouseUp },
