@@ -6,16 +6,21 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 // @ts-ignore
 import randomcolor from 'randomcolor';
+import StateContext from './contexts/StateContext';
 
 export type ColoredBox = { box: Box, color: string };
 
-type State = {
+export type State = {
     boxes: ColoredBox[],
-    nextColor: string
+    nextBox: Box | null,
+    nextColor: string,
+    format: string,
 };
-type Action = 
+export type Action = 
+    | { type: 'SET_NEXT_BOX', box: Box | null }
     | { type: 'ADD_BOX', box: ColoredBox }
-    | { type: 'REMOVE_BOX', index: number };
+    | { type: 'REMOVE_BOX', index: number }
+    | { type: 'SET_FORMAT', format: string };
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -30,41 +35,41 @@ function reducer(state: State, action: Action): State {
                 ...state,
                 boxes: state.boxes.filter((_, i) => i !== action.index)
             }
+        case 'SET_FORMAT':
+            return {
+                ...state,
+                format: action.format
+            }
+        case 'SET_NEXT_BOX':
+            return {
+                ...state,
+                nextBox: action.box
+            }
     }
 }
 
-function App() {
-    const [state, dispatch] = useReducer(reducer, {boxes: [], nextColor: randomcolor()});
-    const { selectDragMouseHandlers, currentBox } = usePointerSelectDrag(
-        box => dispatch({type: 'ADD_BOX', box: {
-            box,
-            color: state.nextColor
-        }})
-    );
+const initialState = (): State => ({
+    boxes: [], 
+    nextColor: randomcolor(), 
+    format: '$x1, $y1, $x2, $y2', 
+    nextBox: null
+});
 
-    const nextBox = currentBox && {
-        box: currentBox,
-        color: state.nextColor
-    }
+function App() {
+    const [state, dispatch] = useReducer(reducer, null, initialState);
 
     return (
-        <div className="App">
-            <div className="grid-container">
-                <div className="topbar">
-                    <span className="brand">OCR Template Tool</span>
+        <StateContext.Provider value={{state,dispatch}}>
+            <div className="App">
+                <div className="grid-container">
+                    <div className="topbar">
+                        <span className="brand">OCR Template Tool</span>
+                    </div>
+                    <Sidebar/>
+                    <Editor/>
                 </div>
-                <Sidebar 
-                    list={state.boxes}
-                    currentBox={nextBox}
-                    removeCoords={i => dispatch({type: 'REMOVE_BOX', index: i})}
-                />
-                <Editor
-                    list={state.boxes}
-                    currentBox={nextBox}
-                    selectDragMouseHandlers={selectDragMouseHandlers}
-                />
             </div>
-        </div>
+        </StateContext.Provider>
     );
 }
 

@@ -1,37 +1,35 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Alert } from 'react-bootstrap';
-import { ColoredBox } from '../App';
+import StateContext from '../contexts/StateContext';
+import { Box } from '../hooks/usePointerSelectDrag';
+import { formatBoxToString } from '../utils';
 
-export default function Sidebar({ currentBox, list, removeCoords }: { currentBox?: ColoredBox; list: ColoredBox[]; removeCoords: (i: number) => void }) {
+export default function Sidebar() {
+    const {state, dispatch} = useContext(StateContext);
     return (
         <div className="sidebar">
-            <h4>Coordinates</h4>
-            <small>(x1, y1, x2, y2)</small>
-            {list.map(({box, color}, i) => (
+            <h4>Boxes</h4>
+            Format: <input type="text" value={state.format} onChange={e => dispatch({type: 'SET_FORMAT', format: e.target.value})}/>
+            {state.boxes.map(({box, color}, i) => (
                 <Alert key={i} variant="info" style={{backgroundColor: color + '33'}}>
-                    {[
-                        box.x1,
-                        box.y1,
-                        box.x2,
-                        box.y2,
-                    ].map(Math.round).join(', ')}
+                    {formatBoxToString(box, state.format)}
                     <button
                         type="button"
                         className="close"
                         aria-label="Close"
-                        onClick={() => removeCoords(i)}
+                        onClick={() => dispatch({type: 'REMOVE_BOX', index: i})}
                     >
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </Alert>
             ))}
-            {currentBox && (
-                <Alert variant="light" style={{backgroundColor: currentBox.color + '33'}}>
+            {state.nextBox && (
+                <Alert variant="light" style={{backgroundColor: state.nextColor + '33'}}>
                     {[
-                        currentBox.box.x1,
-                        currentBox.box.y1,
-                        currentBox.box.x2,
-                        currentBox.box.y2,
+                        state.nextBox.x1,
+                        state.nextBox.y1,
+                        state.nextBox.x2,
+                        state.nextBox.y2,
                     ].map(Math.round).join(', ')}
                 </Alert>
             )}

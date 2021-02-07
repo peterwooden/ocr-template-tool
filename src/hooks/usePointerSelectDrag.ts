@@ -24,18 +24,25 @@ export type SelectDragMouseHandlers = {
     onMouseUp: () => void;
 }
 
-export default function usePointerSelectDrag(onComplete: (box: Box) => void): { selectDragMouseHandlers: SelectDragMouseHandlers; currentBox?: Box } {
-    const [mouseDown, setMouseDown] = useState(false);
-    const [[x1, y1], setStartingPoint] = useState([0, 0]);
-    const [[x2, y2], setCurrentPoint] = useState([0, 0]);
-    const box: Box = useMemo(() => ({
+function coordsToBox(x1: number, y1: number, x2: number, y2: number): Box {
+    return {
         x1: Math.min(x1, x2), 
-        y1: Math.min(y1, y2), 
+        y1: Math.min(y1, y2),
         x2: Math.max(x1, x2), 
         y2: Math.max(y1, y2), 
         w: Math.abs(x2 - x1), 
         h: Math.abs(y2 - y1)
-    }), [x1, y1, x2, y2]);
+    };
+}
+
+export default function usePointerSelectDrag({onComplete, onUpdate}: {onComplete?: (box: Box) => void, onUpdate?: (box: Box | null) => void}): SelectDragMouseHandlers {
+    const [mouseDown, setMouseDown] = useState(false);
+    const [[x1, y1], setStartingPoint] = useState([0, 0]);
+    const [[x2, y2], setCurrentPoint] = useState([0, 0]);
+    const box: Box = useMemo(
+        () => coordsToBox(x1, y1, x2, y2), 
+        [x1, y1, x2, y2]
+    );
 
     const onMouseDown = useCallback((e: ReactMouseEvent) => {
         if (e.button === 0) {
@@ -43,12 +50,14 @@ export default function usePointerSelectDrag(onComplete: (box: Box) => void): { 
             setStartingPoint([x, y]);
             setCurrentPoint([x, y]);
             setMouseDown(true);
+            onUpdate?.(coordsToBox(x, y, x, y));
         }
     }, []);
     const onMouseUp = useCallback(
         () => {
             if (mouseDown) {
                 setMouseDown(false);
+                onUpdate?.(null);
                 onComplete?.(box);
             }
         },
@@ -57,13 +66,13 @@ export default function usePointerSelectDrag(onComplete: (box: Box) => void): { 
     const onMouseMove = useCallback(
         (e: ReactMouseEvent) => {
             const { x, y } = eventToPointerCoordinates(e);
-            if (mouseDown) setCurrentPoint([x, y]);
+            if (mouseDown) {
+                setCurrentPoint([x, y]);
+                onUpdate?.(coordsToBox(x1, y1, x, y))
+            }
         },
         [mouseDown]
     );
 
-    return {
-        selectDragMouseHandlers: { onMouseDown, onMouseMove, onMouseUp },
-        currentBox: mouseDown ? box : undefined,
-    };
+    return { onMouseDown, onMouseMove, onMouseUp };
 }
