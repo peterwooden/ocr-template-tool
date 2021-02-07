@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Alert } from 'react-bootstrap';
 import StateContext from '../contexts/StateContext';
-import { Box } from '../hooks/usePointerSelectDrag';
 import { formatBoxToString } from '../utils';
 
 export default function Sidebar() {
