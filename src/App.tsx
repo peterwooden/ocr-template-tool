@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react';
-import usePointerSelectDrag, { Box } from './hooks/usePointerSelectDrag';
+import { Box } from './hooks/usePointerSelectDrag';
 import Editor from './components/Editor';
 import Sidebar from './components/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -20,7 +20,8 @@ export type Action =
     | { type: 'SET_NEXT_BOX', box: Box | null }
     | { type: 'ADD_BOX', box: ColoredBox }
     | { type: 'REMOVE_BOX', index: number }
-    | { type: 'SET_FORMAT', format: string };
+    | { type: 'SET_FORMAT', format: string }
+    | { type: 'UPDATE_BOX', box: Partial<Box>, index: number };
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -44,6 +45,11 @@ function reducer(state: State, action: Action): State {
             return {
                 ...state,
                 nextBox: action.box
+            }
+        case 'UPDATE_BOX':
+            return {
+                ...state,
+                boxes: state.boxes.map((box, i) => i === action.index ? { box: {...box.box, ...action.box}, color: box.color } : box)
             }
     }
 }

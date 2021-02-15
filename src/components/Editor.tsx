@@ -1,36 +1,61 @@
-import React, { useContext } from 'react';
+import React, {
+    useCallback,
+    useContext,
+    useState,
+} from 'react';
 import StateContext from '../contexts/StateContext';
 import useImageDropzone from '../hooks/useImageDropzone';
 import usePointerSelectDrag from '../hooks/usePointerSelectDrag';
-import { coordsToStyle } from '../utils';
+import { Boxes } from './Boxes';
 
 export default function Editor() {
     const { imgSrc, getRootProps, getInputProps } = useImageDropzone();
     const { state, dispatch } = useContext(StateContext);
+    const [imageBoundingBox, setImageBoundingBox] = useState<DOMRect | null>(
+        null
+    );
+    const measureRef = useCallback(
+        (node: SVGImageElement | null) =>
+            setImageBoundingBox(node?.getBBox() || null),
+        []
+    );
     const selectDragMouseHandlers = usePointerSelectDrag({
-        onComplete: (box) => dispatch({type: 'ADD_BOX', box: {
-            box,
-            color: state.nextColor
-        }}),
-        onUpdate: (box) => dispatch({type: 'SET_NEXT_BOX', box})
+        onComplete: (box) =>
+            dispatch({
+                type: 'ADD_BOX',
+                box: {
+                    box,
+                    color: state.nextColor,
+                },
+            }),
+        onUpdate: (box) => dispatch({ type: 'SET_NEXT_BOX', box }),
     });
 
     return (
         <div className="editor">
             <div {...getRootProps({ className: 'dropzone' })}>
                 <input {...getInputProps()} />
-                {imgSrc ? (
-                    <img
-                        src={imgSrc}
-                        draggable="false"
-                        alt="template"
-                        {...selectDragMouseHandlers}
-                    />
-                ) : (
-                    <div className="centered">Drop an image here</div>
-                )}
-                {state.boxes.map((box, i) => <div key={i} className="box" style={coordsToStyle(box)} />)}
-                {state.nextBox && <div className="box" style={coordsToStyle({box: state.nextBox, color: state.nextColor})} />}
+                <svg
+                    style={{
+                        position: 'absolute',
+                        width: imageBoundingBox?.width || '100%',
+                        height: imageBoundingBox?.height || '100%',
+                    }}
+                >
+                    {imgSrc ? (
+                        <image
+                            href={imgSrc}
+                            {...selectDragMouseHandlers}
+                            ref={measureRef}
+                        />
+                    ) : (
+                        <text textAnchor="middle" x="50%" y="15%">
+                            Drop an image here
+                        </text>
+                    )}
+
+                    <Boxes />
+                </svg>
             </div>
         </div>
     );

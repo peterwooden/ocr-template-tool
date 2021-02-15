@@ -63,4 +63,41 @@ img {
   display: block;
   border-style: solid;
   pointer-events: none;
+  opacity: 1;
+}
+
+/*.box:hover {
+  opacity: 1;
+}*/
+
+.format-input {
+  text-align: center;
+  font-family: monospace;
+}
+
+.format-area {
+  margin-bottom: 1rem;
+}
+
+.tooltip-span {
+  border-bottom: 1.5px dotted #ccc;
+  color: rgb(32, 32, 58);
+}
+
+.editable-line {
+  stroke-opacity: 0;
+  transition: stroke-opacity 0.1s;
+}
+
+.editable-line:hover {
+  stroke-opacity: 0.6;
+}
+
+.editable-box {
+  fill-opacity: 0.3;
+  transition: fill-opacity 0.1s;
+}
+
+.editable-box:hover {
+  fill-opacity: 0.4;
 }

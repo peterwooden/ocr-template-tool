@@ -8,7 +8,9 @@ export default function Sidebar() {
     return (
         <div className="sidebar">
             <h4>Boxes</h4>
-            Format: <input type="text" value={state.format} onChange={e => dispatch({type: 'SET_FORMAT', format: e.target.value})}/>
+            <div className="format-area">
+                <span title="Use the variables $w, $h, $x1, $x2, $y1, $y2" className="tooltip-span">Format</span>: <input type="text" value={state.format} onChange={e => dispatch({type: 'SET_FORMAT', format: e.target.value})} className="format-input"/>
+            </div>
             {state.boxes.map(({box, color}, i) => (
                 <Alert key={i} variant="info" style={{backgroundColor: color + '33'}}>
                     {formatBoxToString(box, state.format)}

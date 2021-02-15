@@ -1,11 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-
-
-
-function eventToPointerCoordinates(e: ReactMouseEvent) {
-    const { left, top } = (e.target as HTMLElement).getBoundingClientRect();
-    return { x: e.clientX - left, y: e.clientY - top};
-}
+import { eventToPointerCoordinates } from '../utils';
 
 export type Box = {
     x1: number;
@@ -16,7 +10,7 @@ export type Box = {
     h: number;
 }
 
-type ReactMouseEvent = React.MouseEvent<HTMLElement, MouseEvent>;
+export type ReactMouseEvent = React.MouseEvent<HTMLElement | SVGElement, MouseEvent>;
 
 export type SelectDragMouseHandlers = {
     onMouseDown: (e: ReactMouseEvent) => void;
@@ -52,7 +46,7 @@ export default function usePointerSelectDrag({onComplete, onUpdate}: {onComplete
             setMouseDown(true);
             onUpdate?.(coordsToBox(x, y, x, y));
         }
-    }, []);
+    }, [onUpdate]);
     const onMouseUp = useCallback(
         () => {
             if (mouseDown) {
@@ -61,7 +55,7 @@ export default function usePointerSelectDrag({onComplete, onUpdate}: {onComplete
                 onComplete?.(box);
             }
         },
-        [box, onComplete, mouseDown]
+        [box, onComplete, mouseDown, onUpdate]
     );
     const onMouseMove = useCallback(
         (e: ReactMouseEvent) => {
@@ -71,7 +65,7 @@ export default function usePointerSelectDrag({onComplete, onUpdate}: {onComplete
                 onUpdate?.(coordsToBox(x1, y1, x, y))
             }
         },
-        [mouseDown]
+        [mouseDown, onUpdate, x1, y1]
     );
 
     return { onMouseDown, onMouseMove, onMouseUp };
