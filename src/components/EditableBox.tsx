@@ -34,6 +34,7 @@ export function EditableBox({
                 difference: { dx: number; dy: number }
             ) => Partial<Box>
         ) => {
+            dispatch({ type: 'CREATE_UNDO_POINT' });
             cleanupFn.current?.();
             const oldScreenCoords = { x: ev.screenX, y: ev.screenY };
             const oldBox = box.box;
@@ -48,8 +49,9 @@ export function EditableBox({
                 });
             };
             document.addEventListener('mousemove', subscription);
-            const removeSubscription = () =>
+            const removeSubscription = () => {
                 document.removeEventListener('mousemove', subscription);
+            };
             document.addEventListener('mouseup', removeSubscription, {
                 once: true,
             });

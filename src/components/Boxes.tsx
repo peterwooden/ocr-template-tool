@@ -3,7 +3,7 @@ import StateContext from '../contexts/StateContext';
 import { EditableBox } from './EditableBox';
 
 export function Boxes() {
-    const { state } = useContext(StateContext);
+    const { state: { current: state } } = useContext(StateContext);
 
     return (
         <>

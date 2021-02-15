@@ -10,7 +10,7 @@ import { Boxes } from './Boxes';
 
 export default function Editor() {
     const { imgSrc, getRootProps, getInputProps } = useImageDropzone();
-    const { state, dispatch } = useContext(StateContext);
+    const { state: { current: state }, dispatch } = useContext(StateContext);
     const [imageBoundingBox, setImageBoundingBox] = useState<DOMRect | null>(
         null
     );
@@ -20,14 +20,16 @@ export default function Editor() {
         []
     );
     const selectDragMouseHandlers = usePointerSelectDrag({
-        onComplete: (box) =>
+        onComplete: (box) => {
+            dispatch({ type: 'CREATE_UNDO_POINT' });
             dispatch({
                 type: 'ADD_BOX',
                 box: {
                     box,
                     color: state.nextColor,
                 },
-            }),
+            });
+        },
         onUpdate: (box) => dispatch({ type: 'SET_NEXT_BOX', box }),
     });
 

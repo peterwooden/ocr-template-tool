@@ -5,7 +5,7 @@ import { Clipboard, X } from 'react-feather';
 import copy from 'copy-to-clipboard';
 
 export default function Sidebar() {
-    const { state, dispatch } = useContext(StateContext);
+    const { state: { current: state }, dispatch } = useContext(StateContext);
     return (
         <div className="sidebar border-right">
             <h4>Boxes</h4>
@@ -23,6 +23,7 @@ export default function Sidebar() {
                     onChange={(e) =>
                         dispatch({ type: 'SET_FORMAT', format: e.target.value })
                     }
+                    onFocus={() => dispatch({ type: 'CREATE_UNDO_POINT' })}
                     className="format-input"
                 />
             </div>
@@ -47,9 +48,10 @@ export default function Sidebar() {
                             <button
                                 type="button"
                                 className="box-list-item-icon"
-                                onClick={() =>
-                                    dispatch({ type: 'REMOVE_BOX', index: i })
-                                }
+                                onClick={() => {
+                                    dispatch({ type: 'CREATE_UNDO_POINT' });
+                                    dispatch({ type: 'REMOVE_BOX', index: i });
+                                }}
                             >
                                 <X size={16} />
                             </button>
