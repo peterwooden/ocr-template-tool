@@ -8,13 +8,15 @@ import './App.css';
 import randomcolor from 'randomcolor';
 import StateContext from './contexts/StateContext';
 
+import produce, { Draft } from 'immer';
+
 export type ColoredBox = { box: Box, color: string };
 
 export type State = {
-    boxes: ColoredBox[],
-    nextBox: Box | null,
-    nextColor: string,
-    format: string,
+    readonly boxes: readonly ColoredBox[],
+    readonly nextBox: Box | null,
+    readonly nextColor: string,
+    readonly format: string,
 };
 export type Action = 
     | { type: 'SET_NEXT_BOX', box: Box | null }
@@ -23,34 +25,25 @@ export type Action =
     | { type: 'SET_FORMAT', format: string }
     | { type: 'UPDATE_BOX', box: Partial<Box>, index: number };
 
-function reducer(state: State, action: Action): State {
+function reducer(state: Draft<State>, action: Action) {
     switch (action.type) {
         case 'ADD_BOX':
-            return {
-                ...state,
-                boxes: state.boxes.concat(action.box),
-                nextColor: randomcolor()
-            }
+            state.boxes.push(action.box);
+            state.nextColor = randomcolor();
+            break;
         case 'REMOVE_BOX':
-            return {
-                ...state,
-                boxes: state.boxes.filter((_, i) => i !== action.index)
-            }
+            state.boxes.splice(action.index, 1);
+            break;
         case 'SET_FORMAT':
-            return {
-                ...state,
-                format: action.format
-            }
+            state.format = action.format;
+            break;
         case 'SET_NEXT_BOX':
-            return {
-                ...state,
-                nextBox: action.box
-            }
+            state.nextBox = action.box;
+            break;
         case 'UPDATE_BOX':
-            return {
-                ...state,
-                boxes: state.boxes.map((box, i) => i === action.index ? { box: {...box.box, ...action.box}, color: box.color } : box)
-            }
+            const box = state.boxes[action.index];
+            box.box = {...box.box, ...action.box};
+            break;
     }
 }
 
@@ -61,8 +54,10 @@ const initialState = (): State => ({
     nextBox: null
 });
 
+const curriedReducerFunction = produce(reducer);
+
 function App() {
-    const [state, dispatch] = useReducer(reducer, null, initialState);
+    const [state, dispatch] = useReducer(curriedReducerFunction, null, initialState);
 
     return (
         <StateContext.Provider value={{state,dispatch}}>
