@@ -2,6 +2,7 @@ import React, {
     useCallback,
     useContext,
     useEffect,
+    useMemo,
     useRef,
 } from 'react';
 import { ColoredBox } from '../App';
@@ -9,6 +10,13 @@ import StateContext from '../contexts/StateContext';
 import { Box } from '../hooks/usePointerSelectDrag';
 
 const STROKE_WIDTH = 4;
+
+
+const canvas = document.createElement('canvas');
+const context = canvas.getContext('2d');
+if (context) {
+    context.font = '13px monospace';
+}
 
 export function EditableBox({
     box,
@@ -19,7 +27,15 @@ export function EditableBox({
     editable: boolean;
     id: number;
 }) {
-    const { dispatch } = useContext(StateContext);
+    const { dispatch, state } = useContext(StateContext);
+
+    // Focus on the input element if it is new
+    const inputRef = useCallback((node: HTMLInputElement | null) => {
+        if (node && id === state.current.boxes.length - 1 && state.next.length === 0) {
+            node.select();
+        }
+        // eslint-disable-next-line
+    }, [id]);
 
     // Clean up subscriptions
     const cleanupFn = useRef<(() => void) | undefined>();
@@ -116,6 +132,8 @@ export function EditableBox({
         [subscribe]
     );
 
+    const tagWidth = useMemo(() => context ? context.measureText(box.tag).width + 5 : 20, [box.tag]);
+
     return (
         <>
             <rect
@@ -130,6 +148,31 @@ export function EditableBox({
                 style={{ strokeWidth: 1, stroke: box.color + 'c3' }}
                 className="editable-box"
             />
+            <rect 
+                x={box.box.x1 + Math.max(0, (box.box.w - tagWidth) / 2)}
+                y={box.box.y1 + Math.max(0, (box.box.h - 18) / 2)}
+                width={Math.min(tagWidth, box.box.w)}
+                height={Math.min(18, box.box.h)}
+                fill={box.color}
+                className="tag-input-background"
+            />
+            <foreignObject 
+                x={box.box.x1 + Math.max(0, (box.box.w - tagWidth) / 2)}
+                y={box.box.y1 + Math.max(0, (box.box.h - 18) / 2)}
+                width={Math.min(tagWidth, box.box.w)}
+                height={Math.min(18, box.box.h)}
+            >
+                <div className="tag-input-div">
+                    <input
+                        value={box.tag}
+                        onChange={(e) => dispatch({ type: 'SET_BOX_TAG', index: id, tag: e.target.value})}
+                        onFocus={() => dispatch({ type: 'CREATE_UNDO_POINT' })}
+                        className="tag-input"
+                        ref={inputRef}
+                    />
+                </div>
+            </foreignObject>
+            
             <line
                 x1={box.box.x1}
                 x2={box.box.x1}

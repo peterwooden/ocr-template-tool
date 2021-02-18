@@ -11,7 +11,7 @@ import StateContext from './contexts/StateContext';
 import produce, { Draft } from 'immer';
 import { RotateCcw, RotateCw } from 'react-feather';
 
-export type ColoredBox = { box: Box; color: string };
+export type ColoredBox = { box: Box; color: string; tag: string };
 
 export type State = Undoable<{
     readonly boxes: readonly ColoredBox[];
@@ -30,6 +30,7 @@ export type Action =
     | { type: 'SET_NEXT_BOX'; box: Box | null }
     | { type: 'ADD_BOX'; box: ColoredBox }
     | { type: 'REMOVE_BOX'; index: number }
+    | { type: 'SET_BOX_TAG'; tag: string; index: number }
     | { type: 'SET_FORMAT'; format: string }
     | { type: 'UPDATE_BOX'; box: Partial<Box>; index: number }
     | { type: 'CREATE_UNDO_POINT' }
@@ -50,6 +51,9 @@ function reducer(state: Draft<State>, action: Action) {
             break;
         case 'SET_NEXT_BOX':
             state.current.nextBox = action.box;
+            break;
+        case 'SET_BOX_TAG':
+            state.current.boxes[action.index].tag = action.tag;
             break;
         case 'UPDATE_BOX':
             const box = state.current.boxes[action.index];
@@ -81,7 +85,7 @@ const initialState = (): State => ({
     current: {
         boxes: [],
         nextColor: randomcolor(),
-        format: '$x1, $y1, $x2, $y2',
+        format: '$tag: $x1, $y1, $x2, $y2',
         nextBox: null,
     },
     next: [],

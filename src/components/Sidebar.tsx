@@ -6,12 +6,15 @@ import copy from 'copy-to-clipboard';
 
 export default function Sidebar() {
     const { state: { current: state }, dispatch } = useContext(StateContext);
+
+    const list = state.boxes.map(box => formatBoxToString(box, state.format));
+
     return (
         <div className="sidebar border-right">
             <h4>Boxes</h4>
             <div className="format-area">
                 <span
-                    title="Use the variables $w, $h, $x1, $x2, $y1, $y2"
+                    title="Use the variables $tag, $w, $h, $x1, $y1, $y2, $x2"
                     className="tooltip-span"
                 >
                     Format
@@ -24,11 +27,11 @@ export default function Sidebar() {
                         dispatch({ type: 'SET_FORMAT', format: e.target.value })
                     }
                     onFocus={() => dispatch({ type: 'CREATE_UNDO_POINT' })}
-                    className="format-input"
+                    className="format-input form-control d-inline w-auto"
+                    size={24}
                 />
             </div>
-            {state.boxes.map(({ box, color }, i) => {
-                const text = formatBoxToString(box, state.format);
+            {state.boxes.map(({ color }, i) => {
                 return (
                     <div
                         key={i}
@@ -36,12 +39,13 @@ export default function Sidebar() {
                         className="d-flex justify-content-between align-items-center p-2 mb-2 rounded"
                     >
                         <span />
-                        <span>{text}</span>
+                        <span>{list[i]}</span>
                         <span className="d-inline-flex align-items-center">
                             <button
                                 type="button"
                                 className="box-list-item-icon"
-                                onClick={() => copy(text)}
+                                onClick={() => copy(list[i])}
+                                title="Copy"
                             >
                                 <Clipboard size={16} />
                             </button>
@@ -52,6 +56,7 @@ export default function Sidebar() {
                                     dispatch({ type: 'CREATE_UNDO_POINT' });
                                     dispatch({ type: 'REMOVE_BOX', index: i });
                                 }}
+                                title="Delete"
                             >
                                 <X size={16} />
                             </button>
@@ -65,14 +70,7 @@ export default function Sidebar() {
                     className="d-flex justify-content-center align-items-center p-2 mb-2 rounded"
                 >
                     <span>
-                        {[
-                            state.nextBox.x1,
-                            state.nextBox.y1,
-                            state.nextBox.x2,
-                            state.nextBox.y2,
-                        ]
-                            .map(Math.round)
-                            .join(', ')}
+                        {formatBoxToString({ box: state.nextBox, color: state.nextColor, tag: 'Tag'}, state.format)}
                     </span>
                 </div>
             )}

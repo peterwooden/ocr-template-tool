@@ -27,6 +27,7 @@ export default function Editor() {
                 box: {
                     box,
                     color: state.nextColor,
+                    tag: 'Tag',
                 },
             });
         },
@@ -49,6 +50,7 @@ export default function Editor() {
                             href={imgSrc}
                             {...selectDragMouseHandlers}
                             ref={measureRef}
+                            cursor="crosshair"
                         />
                     ) : (
                         <text textAnchor="middle" x="50%" y="15%">
