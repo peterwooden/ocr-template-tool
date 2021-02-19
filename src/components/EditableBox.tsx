@@ -11,7 +11,6 @@ import { Box } from '../hooks/usePointerSelectDrag';
 
 const STROKE_WIDTH = 4;
 
-
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
 if (context) {
@@ -30,12 +29,19 @@ export function EditableBox({
     const { dispatch, state } = useContext(StateContext);
 
     // Focus on the input element if it is new
-    const inputRef = useCallback((node: HTMLInputElement | null) => {
-        if (node && id === state.current.boxes.length - 1 && state.next.length === 0) {
-            node.select();
-        }
+    const inputRef = useCallback(
+        (node: HTMLInputElement | null) => {
+            if (
+                node &&
+                id === state.current.boxes.length - 1 &&
+                state.next.length === 0
+            ) {
+                node.select();
+            }
+        },
         // eslint-disable-next-line
-    }, [id]);
+        [id]
+    );
 
     // Clean up subscriptions
     const cleanupFn = useRef<(() => void) | undefined>();
@@ -132,7 +138,20 @@ export function EditableBox({
         [subscribe]
     );
 
-    const tagWidth = useMemo(() => context ? context.measureText(box.tag).width + 5 : 20, [box.tag]);
+    const tagWidth = useMemo(
+        () => (context ? context.measureText(box.tag).width + 5 : 20),
+        [box.tag]
+    );
+
+    const onInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) =>
+            dispatch({ type: 'SET_BOX_TAG', index: id, tag: e.target.value }),
+        [dispatch, id]
+    );
+    const onInputFocus = useCallback(
+        () => dispatch({ type: 'CREATE_UNDO_POINT' }),
+        [dispatch]
+    );
 
     return (
         <>
@@ -148,7 +167,7 @@ export function EditableBox({
                 style={{ strokeWidth: 1, stroke: box.color + 'c3' }}
                 className="editable-box"
             />
-            <rect 
+            <rect
                 x={box.box.x1 + Math.max(0, (box.box.w - tagWidth) / 2)}
                 y={box.box.y1 + Math.max(0, (box.box.h - 18) / 2)}
                 width={Math.min(tagWidth, box.box.w)}
@@ -156,7 +175,7 @@ export function EditableBox({
                 fill={box.color}
                 className="tag-input-background"
             />
-            <foreignObject 
+            <foreignObject
                 x={box.box.x1 + Math.max(0, (box.box.w - tagWidth) / 2)}
                 y={box.box.y1 + Math.max(0, (box.box.h - 18) / 2)}
                 width={Math.min(tagWidth, box.box.w)}
@@ -165,14 +184,14 @@ export function EditableBox({
                 <div className="tag-input-div">
                     <input
                         value={box.tag}
-                        onChange={(e) => dispatch({ type: 'SET_BOX_TAG', index: id, tag: e.target.value})}
-                        onFocus={() => dispatch({ type: 'CREATE_UNDO_POINT' })}
+                        onChange={onInputChange}
+                        onFocus={onInputFocus}
                         className="tag-input"
                         ref={inputRef}
                     />
                 </div>
             </foreignObject>
-            
+
             <line
                 x1={box.box.x1}
                 x2={box.box.x1}
