@@ -7,7 +7,7 @@ import './App.css';
 // @ts-ignore
 import randomcolor from 'randomcolor';
 import StateContext from './contexts/StateContext';
-
+import { equals, last } from 'ramda';
 import produce, { Draft } from 'immer';
 import { RotateCcw, RotateCw } from 'react-feather';
 
@@ -60,18 +60,24 @@ function reducer(state: Draft<State>, action: Action) {
             box.box = { ...box.box, ...action.box };
             break;
         case 'CREATE_UNDO_POINT':
-            state.previous.push(state.current);
-            state.next = [];
+            if (!equals(state.current, last(state.previous))) {
+                state.previous.push(state.current);
+                state.next = [];
+            }
             break;
         case 'UNDO':
-            let previous = state.previous.pop()
+            let previous;
+            while (
+                equals(state.current, (previous = state.previous.pop())) &&
+                state.previous.length
+            );
             if (previous) {
                 state.next.push(state.current);
                 state.current = previous;
             }
             break;
         case 'REDO':
-            let next = state.next.pop()
+            let next = state.next.pop();
             if (next) {
                 state.previous.push(state.current);
                 state.current = next;
@@ -107,14 +113,22 @@ function App() {
                     <div className="topbar">
                         <span className="brand">OCR Template Tool</span>
                         <span className="d-inline-flex">
-                            <button onClick={() => dispatch({ type: 'UNDO' })} disabled={state.previous.length === 0} className="box-list-item-icon mr-2">
-                                <RotateCcw size={16}/>
+                            <button
+                                onClick={() => dispatch({ type: 'UNDO' })}
+                                disabled={state.previous.length === 0}
+                                className="box-list-item-icon mr-2"
+                            >
+                                <RotateCcw size={16} />
                             </button>
-                            <button onClick={() => dispatch({ type: 'REDO' })} disabled={state.next.length === 0} className="box-list-item-icon">
-                                <RotateCw size={16}/>
+                            <button
+                                onClick={() => dispatch({ type: 'REDO' })}
+                                disabled={state.next.length === 0}
+                                className="box-list-item-icon"
+                            >
+                                <RotateCw size={16} />
                             </button>
                         </span>
-                        <span/>
+                        <span />
                     </div>
                     <Sidebar />
                     <Editor />
