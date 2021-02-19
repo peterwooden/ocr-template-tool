@@ -21,15 +21,18 @@ export default function Editor() {
     );
     const selectDragMouseHandlers = usePointerSelectDrag({
         onComplete: (box) => {
-            dispatch({ type: 'CREATE_UNDO_POINT' });
-            dispatch({
-                type: 'ADD_BOX',
-                box: {
-                    box,
-                    color: state.nextColor,
-                    tag: 'Tag',
-                },
-            });
+            // Only add the box if it is not just a click
+            if (box.h * box.w > 100) {
+                dispatch({ type: 'CREATE_UNDO_POINT' });
+                dispatch({
+                    type: 'ADD_BOX',
+                    box: {
+                        box,
+                        color: state.nextColor,
+                        tag: 'Tag',
+                    },
+                });
+            }
         },
         onUpdate: (box) => dispatch({ type: 'SET_NEXT_BOX', box }),
     });
